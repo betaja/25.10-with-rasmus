@@ -1,28 +1,43 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-export default function CreatePage() {
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+export default function UpdatePage() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState("");
+  const params = useParams();
+  const url = `https://with-rasmus-default-rtdb.firebaseio.com/posts/${params.id}.json`;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function getPost() {
+      const response = await fetch(url);
+      const postData = await response.json();
+      console.log(postData);
+      setCaption(postData.caption);
+      setImage(postData.image);
+    }
+
+    getPost();
+  }, [url]);
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const post = { caption, image, uid: "ZfPTVEMQKf9vhNiUh0bj" };
+    const postToUpdate = { caption, image };
 
-    const response = await fetch(
-      "https://with-rasmus-default-rtdb.firebaseio.com/posts.json",
-      {
-        method: "POST",
-        body: JSON.stringify(post),
-      }
-    );
+    const response = await fetch(url, {
+      method: "PATCH", //"patch" updates, "put" replaces
+      body: JSON.stringify(postToUpdate),
+    });
 
     if (response.ok) {
-      navigate("/");
+      navigate(`/posts/${params.id}`);
+    } else {
+      console.log("Error updating post data");
     }
   }
 
+  //upload image not by url but from local storage
   function handleImageChange(event) {
     const file = event.target.files[0];
     if (file.size < 500000) {
@@ -38,8 +53,9 @@ export default function CreatePage() {
   }
 
   return (
-    <section className="page">
+    <section className="page" id="update-page">
       <div className="container">
+        <h1>Update Post</h1>
         <form className="form-grid" onSubmit={handleSubmit}>
           <label htmlFor="caption">Caption</label>
           <input

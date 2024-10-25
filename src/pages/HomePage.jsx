@@ -6,14 +6,14 @@ export default function HomePage() {
   // Fetch data from the API
   useEffect(() => {
     async function fetchPosts() {
-      const url = "https://YOUR-FIREBASE-URL.com/posts.json";
+      const url = "https://with-rasmus-default-rtdb.firebaseio.com/posts.json";
       const response = await fetch(url);
       const data = await response.json(); // JSON.parse(response)
       console.log(data);
       // from object to array
-      const postsArray = Object.keys(data).map(postId => ({
+      const postsArray = Object.keys(data).map((postId) => ({
         id: postId,
-        ...data[postId]
+        ...data[postId],
       }));
       console.log(postsArray);
       setPosts(postsArray);
@@ -25,7 +25,7 @@ export default function HomePage() {
   return (
     <section className="page">
       <div className="grid">
-        {posts.map(post => (
+        {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
       </div>
